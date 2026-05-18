@@ -1,2 +1,7 @@
+const http = require('http');
 
-console.log("Hello from Jenkins + GitHub 🚀");  
+const server = http.createServer((req, res) => {
+  res.end("Hello from DevOps 🚀");
+});
+
+server.listen(80);
