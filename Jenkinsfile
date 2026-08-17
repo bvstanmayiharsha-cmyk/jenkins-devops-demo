@@ -23,14 +23,22 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t myapp:v2 .'
+                sh '''
+                    docker build -t myapp:v2 .
+                '''
             }
         }
 
         stage('Run Container') {
             steps {
-                sh 'docker rm -f myapp-container || true'
-                sh 'docker run -d -p 8083:80 --name myapp-container myapp:v2'
+                sh '''
+                    docker rm -f myapp-container 2>/dev/null || true
+
+                    docker run -d \
+                      --network k3d-mycluster \
+                      --name myapp-container \
+                      myapp:v2
+                '''
             }
         }
 
@@ -38,7 +46,7 @@ pipeline {
             steps {
                 sh '''
                     sleep 3
-                    curl -f http://localhost:8083
+                    curl -f http://myapp-container:80
                 '''
             }
         }
@@ -46,7 +54,17 @@ pipeline {
 
     post {
         always {
-            sh 'docker rm -f myapp-container || true'
+            sh '''
+                docker rm -f myapp-container 2>/dev/null || true
+            '''
+        }
+
+        success {
+            echo 'CI pipeline completed successfully!'
+        }
+
+        failure {
+            echo 'CI pipeline failed. Check the stage logs above.'
         }
     }
 }
