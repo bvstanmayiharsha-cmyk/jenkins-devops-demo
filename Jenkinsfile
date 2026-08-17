@@ -13,7 +13,7 @@ pipeline {
             steps {
                 sh '''
                     docker run --rm \
-                      -v "$WORKSPACE:/app" \
+                      -v /var/lib/docker/volumes/jenkins_home/_data${WORKSPACE#/var/jenkins_home}:/app \
                       -w /app \
                       node:20 \
                       npm test
