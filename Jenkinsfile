@@ -11,7 +11,13 @@ pipeline {
 
         stage('Test') {
             steps {
-                sh 'npm test'
+                sh '''
+                    docker run --rm \
+                      -v "$WORKSPACE:/app" \
+                      -w /app \
+                      node:20 \
+                      npm test
+                '''
             }
         }
 
